@@ -13,8 +13,8 @@
 		<org.aspectj-version>1.6.9</org.aspectj-version>
 		<org.slf4j-version>1.5.10</org.slf4j-version>
 	</properties>
+
 	<dependencies>
-	
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -165,6 +165,7 @@
 			<artifactId>hibernate-validator</artifactId>
 			<version>4.2.0.Final</version>
 		</dependency>
+
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

@@ -5,51 +5,59 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import javax.annotation.Resource;
+import javax.ws.rs.core.MediaType;
 
-import net.cyberward.springjersey.config.AppConfig;
-import net.cyberward.springjersey.person.PersonController;
-import net.cyberward.springjersey.person.PersonDTO;
+import net.cyberward.springjersey.BaseControllerIntegrationTest;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-/**
- * Currently throws an exception because the jersey UriInfo class is not defined in Spring. 
- */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AppConfig.class, loader = AnnotationConfigContextLoader.class)
-public class PersonControllerIntegrationTest {
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
 
-	@Resource
-	private PersonController controller;
+public class PersonControllerIntegrationTest extends BaseControllerIntegrationTest {
 
-	private PersonDTO person1;
-	private PersonDTO person2;
+    private PersonDTO person1;
+    private PersonDTO person2;
+
+    public PersonControllerIntegrationTest() {
+	super("net.cyberward.springjersey.person");
+    }
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+	super.setUp();
+	person1 = new PersonDTO();
+	person1.setFirstName("Jim");
+	person1.setLastName("Bean");
+
+	person2 = new PersonDTO();
+	person2.setFirstName("Jimmy");
+	person2.setLastName("Johns");
+    }
+
+    @Test
+    public void testStoreRetrievePerson() {
+	WebResource webResource = resource();
+	webResource.path("person").accept(MediaType.APPLICATION_XML).post(person1);
+
+	PersonDTO response = webResource.path("person/1").accept(MediaType.APPLICATION_XML).get(PersonDTO.class);
+	assertNotNull(response);
+	assertEquals(person1.getFirstName(), response.getFirstName());
+	assertEquals(person1.getLastName(), response.getLastName());
+    }
+
+    @Test
+    public void testGetPeople() {
+	WebResource webResource = resource();
+	GenericType<List<PersonDTO>> personListType = new GenericType<List<PersonDTO>>() {
+	};
+	webResource.path("person").accept(MediaType.APPLICATION_XML).post(person1);
+	webResource.path("person").accept(MediaType.APPLICATION_XML).post(person2);
 	
-	@Before
-	public void setup() {
-		person1 = new PersonDTO();
-		person1.setFirstName("Chris");
-		person1.setLastName("Ward");
-		
-		person2 = new PersonDTO();
-		person2.setFirstName("Joe");
-		person2.setLastName("Shoeless");
-	}
-
-	@Test
-	public void testPerson() {
-
-		controller.createPerson(person1);
-		controller.createPerson(person2);
-		List<PersonDTO> allPeople = controller.getListOfPeople();
-		
-		assertNotNull(allPeople);
-		assertEquals(2, allPeople.size());
-	}
+	List<PersonDTO> response = webResource.path("person").accept(MediaType.APPLICATION_XML).get(personListType);
+	assertNotNull(response);
+	assertEquals(2, response.size());
+    }
 }
