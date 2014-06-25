@@ -19,6 +19,7 @@ public class AppConfig {
 	@Bean
     public PropertyPlaceholderConfigurer getPropertyPlaceholderConfigurer()
     {
+		System.out.println("BEAN INJECTION...");
         PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
         ppc.setLocation(new ClassPathResource("application.properties"));
         ppc.setIgnoreUnresolvablePlaceholders(true);
